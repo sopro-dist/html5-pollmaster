@@ -1,5 +1,5 @@
 /************************
-jquery-timepicker v1.4.9
+jquery-timepicker v1.4.12
 http://jonthornton.github.com/jquery-timepicker/
 
 requires jQuery 1.7+
@@ -487,7 +487,10 @@ requires jQuery 1.7+
 		self.data('timepicker-list', wrapped_list);
 
 		if (settings.useSelect) {
-			list.val(_roundAndFormatTime(self.val(), settings));
+			if (self.val()) {
+				list.val(_roundAndFormatTime(self.val(), settings));
+			}
+
 			list.on('focus', function(){
 				$(this).data('timepicker-input').trigger('showTimepicker');
 			});
@@ -498,6 +501,7 @@ requires jQuery 1.7+
 				_setTimeValue(self, $(this).val(), 'select');
 			});
 
+			_setTimeValue(self, list.val());
 			self.hide().after(list);
 		} else {
 			var appendTo = settings.appendTo;
@@ -669,9 +673,9 @@ requires jQuery 1.7+
 	}
 
 
-	function _formatValue(e)
+	function _formatValue(e, origin)
 	{
-		if (this.value === '') {
+		if (this.value === '' || origin == 'timepicker') {
 			return;
 		}
 
@@ -745,7 +749,7 @@ requires jQuery 1.7+
 			self.val(value);
 
 			var settings = self.data('timepicker-settings');
-			if (settings.useSelect) {
+			if (settings.useSelect && source != 'select') {
 				self.data('timepicker-list').val(_roundAndFormatTime(value, settings));
 			}
 		}
@@ -753,7 +757,7 @@ requires jQuery 1.7+
 		if (self.data('ui-timepicker-value') != value) {
 			self.data('ui-timepicker-value', value);
 			if (source == 'select') {
-				self.trigger('selectTime').trigger('changeTime').trigger('change');
+				self.trigger('selectTime').trigger('changeTime').trigger('change', 'timepicker');
 			} else if (source != 'error') {
 				self.trigger('changeTime');
 			}
@@ -1080,7 +1084,7 @@ requires jQuery 1.7+
 		var ampm = time[4];
 		var hours = hour;
 
-		if (ampm) {
+		if (hour <= 12 && ampm) {
 			if (hour == 12) {
 				hours = (time[4] == _lang.pm) ? 12 : 0;
 			} else {

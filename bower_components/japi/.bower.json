@@ -1,11 +1,12 @@
 {
   "name": "japi",
   "homepage": "https://github.com/SocietyPro/japi",
-  "_release": "ee4266ef60",
+  "version": "0.1.1",
+  "_release": "0.1.1",
   "_resolution": {
-    "type": "branch",
-    "branch": "master",
-    "commit": "ee4266ef60261570f43805d667e79aa77260077f"
+    "type": "version",
+    "tag": "0.1.1",
+    "commit": "8762caeef931a730d0a1a28993461dcb6a722f94"
   },
   "_source": "https://github.com/SocietyPro/japi.git",
   "_target": "*",

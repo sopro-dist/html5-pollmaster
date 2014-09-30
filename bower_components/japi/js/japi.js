@@ -13,6 +13,10 @@ Cambrian.JAPI = function(){
 
   var japi = {
     apps: Cambrian.apps || {},
+    config: {
+      audioEnabled: Cambrian.Settings.AudioEnabled,
+      developerAppsDirectory: Cambrian.Settings.DeveloperAppsDirectory,
+    }, 
     groups: Cambrian.groups,
     me: Cambrian.me,
     peer: {
@@ -192,6 +196,10 @@ Cambrian.JAPI = function(){
     //setTimeout(function(){ callback(null, false) }, 200);
     var list = Cambrian.polls.getList();
     return list;
+  };
+
+  japi.polls.onPollSaved = function () {
+    return Cambrian.polls.onPollSaved();
   };
 
   japi.polls.templates.listExamples = function(){

@@ -1,4 +1,4 @@
-pollApp.controller("targetSelectionCtrl", function($scope){
+app.controller("targetSelectionCtrl", function($scope){
   $scope.chooseTarget = function(type){
     console.log('Choosing',type);
     var targets = null;
@@ -14,7 +14,12 @@ pollApp.controller("targetSelectionCtrl", function($scope){
         break;
       /*  
       case 'peerLists':
-        targets = japi.me.peerLists();
+        // Spec changed. peerLists are now groups.
+        try {
+          targets = japi.me.peerLists
+        } catch(e) {
+          targets = [];
+        }
         hint = "Choose one target Peer List:"
         break;
       */

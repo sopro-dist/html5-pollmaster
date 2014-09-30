@@ -23,13 +23,16 @@ Cambrian.pollApp.mockPolls = [
     },
     turnoutPercent: "82",
     allowComments: true,
+    dismissText: "",
+    submitText: "",
     options: [{text: "I'll be there", count: 42}, {text: "I can't go", count: 40}],
     comments: [
         ["darlith", "I will be 10 minutes late.", new Date("2014-07-18")],
         ["frankenlaser", "This better pay off, last 3 deals with you were bum.", new Date("2014-07-18")],
         ["susan", "should I bring the backup fission reactor?", new Date("2014-07-18")],
         ["chewy", "send me 1 BTC off the recrod in this dialog and I will join up with my entire crew.", new Date("2014-07-18")],
-    ]
+    ],
+    isTemplate: false
   },
   { 
     id: "UUID2",
@@ -47,8 +50,11 @@ Cambrian.pollApp.mockPolls = [
         invalid: 50
     },
     allowComments: false,
+    dismissText: "No Snacks",
+    submitText: "Crunch!",
     options: [{text: "Tortrix BBQ", count: 100}, {text: "Tortrix Crema Agria", count: 630}, {text: "Lays BBQ", count: 100}, {text: "Lays Original", count: 120}],
-    comments: []
+    comments: [],
+    isTemplate: false
   },
   { 
     id: "UUID3",
@@ -66,8 +72,11 @@ Cambrian.pollApp.mockPolls = [
         invalid: 0
     },
     allowComments: false,
+    dismissText: "",
+    submitText: "",
     options: [{text: "Vote Yes", count: 50}, {text: "Vote No", count: 40}, {text: "This is an option that nobody has voted on because nobody will see it. It's just a really long line of text.", count: 0}],
-    comments: []
+    comments: [],
+    isTemplate: false
   },
   { 
     id: "UUID4",
@@ -85,8 +94,11 @@ Cambrian.pollApp.mockPolls = [
         invalid: 0
     },
     allowComments: false,
+    dismissText: "",
+    submitText: "",
     options: [{text: "Yes, I'll buy BTC now", count: 0}],
-    comments: []
+    comments: [],
+    isTemplate: false
   },
   { 
     id: "UUID5",
@@ -104,8 +116,11 @@ Cambrian.pollApp.mockPolls = [
         invalid: 0
     },
     allowComments: false,
+    dismissText: "",
+    submitText: "",
     options: [{text: "Yes, I can join", count: 0}, {text: "Yes, I can join and bring my megaphone", count: 0}, {text: "No, but good luck!", count: 0}, {text: "No way. Swarm Rules!", count: 0}],
-    comments: []
+    comments: [],
+    isTemplate: false
   },
 ];
 
@@ -215,6 +230,7 @@ Cambrian.pollApp.mockTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID102",
@@ -226,6 +242,7 @@ Cambrian.pollApp.mockTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID103",
@@ -237,6 +254,7 @@ Cambrian.pollApp.mockTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID104",
@@ -248,6 +266,7 @@ Cambrian.pollApp.mockTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID105",
@@ -259,6 +278,7 @@ Cambrian.pollApp.mockTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
 ];
 
@@ -273,6 +293,7 @@ Cambrian.pollApp.exampleTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID202",
@@ -284,6 +305,7 @@ Cambrian.pollApp.exampleTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID203",
@@ -295,6 +317,7 @@ Cambrian.pollApp.exampleTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID204",
@@ -306,6 +329,7 @@ Cambrian.pollApp.exampleTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID205",
@@ -317,6 +341,7 @@ Cambrian.pollApp.exampleTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID206",
@@ -328,6 +353,7 @@ Cambrian.pollApp.exampleTemplates = [
     allowComments: true,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
 ];
 
@@ -342,6 +368,7 @@ Cambrian.pollApp.mockPeerTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
   { 
     id: "UUID302",
@@ -353,6 +380,7 @@ Cambrian.pollApp.mockPeerTemplates = [
     allowComments: false,
     dismissText: "Dismiss",
     submitText: "Submit",
+    isTemplate: true
   },
 ];
 
@@ -413,6 +441,17 @@ Cambrian.mockJAPI = function(){
     return undefined;
   };
 
+  var startPoll = function (poll) {
+    for (var i = 0; i < listOfPolls.length; i++) {
+      if (listOfPolls[i] === poll.id) {
+        listOfPolls[i].status = "started";
+        listOfPolls[i].dateStarted = new Date();
+        return undefined;
+      };
+    }
+    return undefined;
+  }
+
   var destroyPoll = function (poll) {
     var index = listOfPolls.indexOf(poll);
 
@@ -446,8 +485,8 @@ Cambrian.mockJAPI = function(){
     };
     mock.start = function(){
       console.log('Starting mock');
-      mock.status = 'started';
-      mock.dateStarted = new Date();
+      this.status = 'started';
+      this.dateStarted = new Date();
     };
     return mock;
   });
@@ -621,9 +660,9 @@ Cambrian.mockJAPI = function(){
       // override some properties with defaults:
       tmp.id = japi.utils.getUUID();
       tmp.status = "unsaved";
-      tmp.save = tmp.save || function(){savePoll(this)};
-      tmp.start = tmp.start || function(){startPoll(this)};
-      tmp.destroy = tmp.destroy || function(){destroyPoll(this)};
+      tmp.save = function(){savePoll(this)};
+      tmp.start = function(){startPoll(this)};
+      tmp.destroy = function(){destroyPoll(this)};
       //listOfPolls.push(tmp);
       return tmp;
     };
@@ -682,8 +721,8 @@ Cambrian.mockJAPI = function(){
       if (listOfPolls[i].id === UUID) {
         return listOfPolls[i];
       }
-      return false;
     }
+    return false;
   };
 
   japi.polls.templates.listExamples = function(){
@@ -744,7 +783,9 @@ Cambrian.mockJAPI = function(){
       };
       // override some properties with defaults:
       tmp.id = japi.utils.getUUID();
-      listOfTemplates.push(tmp);
+      tmp.save = function () {saveTemplate(this)};
+      tmp.destroy = function () {destroyTemplate(this)};
+      //listOfTemplates.push(tmp);
       return tmp;
     };
 
