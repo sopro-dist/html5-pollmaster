@@ -393,6 +393,7 @@ app.controller("pollsCtrl", function ($scope,
   Cambrian.polls.onPollDestroyed.connect(getPollsList);
   Cambrian.polls.onBallotReceived.connect(getPollsList);
   Cambrian.polls.onVoteReceived.connect(getPollsList);
+  Cambrian.polls.onPollStopped.connect(getPollsList);
   $scope.polls = pollAll();
   $scope.addTitlePlaceholder = "Add Poll";
   $scope.addDescriptionPlaceholder = "Add Description";
@@ -590,7 +591,11 @@ app.controller("pollsCtrl", function ($scope,
       controller: ['$scope', '$hideDialog', '$rootScope', '$filter', 'pollFind', function ($scope, $hideDialog, $rootScope, $filter, pollFind) {
         Cambrian.polls.onVoteReceived.connect(refreshPoll);
         $scope.poll = poll;
-        $scope.pollLength = {numeral: poll.pollTimeLength / 60, units: "Minutes"};
+        console.log(poll);
+        if (poll.dateStarted) {
+          var d = new Date(poll.dateStarted.getTime() + (poll.pollTimeLength*1000));    
+          $scope.endPollDate = d.toString().substring(0,d.toString().lastIndexOf(":"));
+        }
         $scope.selectedOptions = $filter('filter')($scope.poll.options, {isSelected: true});
         $scope.dialog = {};
 
@@ -631,9 +636,17 @@ app.controller("pollsCtrl", function ($scope,
           $materialDialog({
             templateUrl: 'partials/showComments.tmpl.html',
             targetEvent: e,
-            controller: ['$scope', '$hideDialog', function ($scope, $hideDialog) {
+            controller: ['$scope', '$hideDialog', 'pollComments', function ($scope, $hideDialog, pollComments) {
+              Cambrian.polls.onVoteReceived.connect(refreshComments);
               $scope.poll = poll;
+              $scope.comments = pollComments(poll);
               $scope.dialog = {};
+
+              $scope.goChat = function (comment) {
+                var jid = comment.name + "@xmpp.cambrian.org";
+                Cambrian.apps.chat.open(jid); //This has to be replaced with the actual jid property name
+                $hideDialog();
+              };
 
               $scope.close = function () {
                 $hideDialog();
@@ -642,6 +655,12 @@ app.controller("pollsCtrl", function ($scope,
               $scope.showPoll = function (e, poll) {
                 $hideDialog();
                 $rootScope.$broadcast('showPollResults', {event: e, poll: poll});
+              };
+
+              function refreshComments (poll) {
+                $scope.$apply (function () {
+                  $scope.comments = pollComments(poll);
+                });
               };
 
             }]
@@ -838,33 +857,24 @@ app.controller("helpCtrl", function ($scope, $modalInstance) {
 });
 
 app.controller("pollEndDateCtrl", ['$scope','$hideDialog','item','saveMatrix','pollCreateOrUpdate', function ($scope, $hideDialog,item,saveMatrix,pollCreateOrUpdate) {
-  $scope.units = ["Minutes", "Hours", "Days", "Weeks", "Months", "Years"];
-  if (item.pollTimeLength) {
-    $scope.pollLength = {numeral: item.pollTimeLength / 60, units: "Minutes"};
+  if (item.dateStarted) {
+    var d = new Date(item.dateStarted.getTime() + (item.pollTimeLength*1000));    
   } else {
-    $scope.pollLength = {numeral: 0, units: "Minutes"};
+    var today = new Date();
+    var d = new Date(today.getTime() + (24*60*60*1000));
   }
-  function convertTimeToSeconds (length, units) {
-    switch(units) {
-      case "Minutes":
-        return length * 60;
-        break;
-      case "Hours":
-        return length * 3600;
-        break;
-      case "Days":
-        return length * 86400;
-        break;
-      case "Weeks":
-        return length * 604800;
-        break;
-      case "Months":
-        return length * 2592000;
-        break;
-      case "Years":
-        return length * 31536000;
-        break;
-    }
+  $scope.edate = d.format("mm/dd/yy");
+  $scope.endTime = new Date();
+  $scope.endTime.setHours(d.getHours());
+  $scope.endTime.setMinutes(d.getMinutes());
+  //var today = new Date();
+  //$scope.endTime = new Date(today.substring(0,))
+
+
+  $scope.convertTimeToSeconds = function (date, time) {
+    var pollDate = new Date(date +" " +time);
+    var todayDate = new Date();
+    return (pollDate.getTime()-todayDate.getTime())/1000;
   };
   function saveItem (item, saveMatrix, startNow) {
       for (var i = 0; i<item.options.length; i++) {
@@ -888,12 +898,26 @@ app.controller("pollEndDateCtrl", ['$scope','$hideDialog','item','saveMatrix','p
       }
 
     };
+  $scope.getTime = function (time) {
+    if (time != undefined) {
+      $scope.time = time.toLocaleTimeString();
+    } else {
+      $scope.time = undefined;
+    }
+  }
   $scope.save = function () {
-      item.pollTimeLength = convertTimeToSeconds($scope.pollLength.numeral, $scope.pollLength.units);
-      saveItem(item, saveMatrix, true);
-      item.overflow = false;
-      $hideDialog();
-    
+    if (!$scope.newDate) {
+      $scope.newDate = $scope.edate;
+    }
+    if ($scope.newDate && $scope.time) {
+      var seconds = $scope.convertTimeToSeconds($scope.newDate, $scope.time);
+      if (seconds > 0) {
+        item.pollTimeLength = seconds | 0;
+        saveItem(item, saveMatrix, true);
+        item.overflow = false;
+        $hideDialog();
+      }
+    }
   }
   $scope.close = function () {
     $hideDialog();

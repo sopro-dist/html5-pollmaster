@@ -4,8 +4,8 @@
     <div class="dialog-content">
       <div class="pollInformation">
         <div layout="horizontal" layout-align="space-between">
-          <span>
-            Poll ends in {{pollLength.numeral}} {{pollLength.units}}
+          <span ng-show="endPollDate">
+            Poll ends in {{endPollDate}}
           </span>
           <span>{{poll.originator}}</span>
         </div>
