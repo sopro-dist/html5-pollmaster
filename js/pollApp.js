@@ -37,11 +37,11 @@ app.config(function($routeProvider){
 
 app.factory("menu", ['$rootScope', function ($rootScope) {
   var self;
-  var filters = [{ filter: 'All', color: '#000000' }, 
-                 { filter: 'Votes', color: '#d19b9b' },
-                 { filter: 'Running', color: '#92e4c9' },
-                 { filter: 'Unstarted', color: '#ffffff' },
-                 { filter: 'Completed', color: '#c9d1ff' }];
+  var filters = [{ filter: 'All', color: '#000' }, 
+                 { filter: 'Vote', color: '#a48623' },
+                 { filter: 'Running', color: '#458B74' },
+                 { filter: 'Unstarted', color: '#D2D6DF' },
+                 { filter: 'Completed', color: '#40505E' }];
 
   return self = {
     filters: filters,
@@ -98,7 +98,8 @@ app.controller("pollAppCtrl", function ($scope,
                                         $modal, 
                                         $materialDialog, 
                                         $materialSidenav, 
-                                        $timeout,  
+                                        $timeout,
+                                        $rootScope,  
                                         menu,
                                         pollNew, 
                                         pollCreateOrUpdate,
@@ -106,22 +107,16 @@ app.controller("pollAppCtrl", function ($scope,
 
     $scope.menu = menu;
     $scope.menu.selectFilter(menu.filters[0]);
-    $scope.view=true;
+    if ($location.path() == "/polls") {
+      $scope.view=true;
+      $scope.isTmpl = false;
+    } else {
+      $scope.view=false;
+      $scope.isTmpl = true;
+    }
+
     
-    $(document).mouseup(function (e) {
-      var container = $("#quickAddBox");
-      if (!container.is(e.target) // if the target of the click isn't the container...
-          && container.has(e.target).length === 0) // ... nor a descendant of the container
-      {
-        var exists = ($('#quickAddBox').length === 1)
-        if (exists) {
-          var scope = angular.element($("#quickAddBox")).scope();
-          scope.$apply(function(){
-              scope.newItem = false;
-          });       
-        }
-      }
-    });
+    
 
     $scope.safeApply = function(fn) {
       var phase = this.$root.$$phase;
@@ -153,10 +148,14 @@ app.controller("pollAppCtrl", function ($scope,
     };
 
     $scope.pollsShow = function () {
+      $scope.isTmpl = false;
+      $scope.view=true;
       $location.path("/polls");
     };
 
     $scope.templatesShow = function () {
+      $scope.isTmpl = true;
+      $scope.view=false;
       $location.path("/templates");
     };
 
@@ -398,6 +397,7 @@ app.controller("pollsCtrl", function ($scope,
   $scope.addTitlePlaceholder = "Add Poll";
   $scope.addDescriptionPlaceholder = "Add Description";
 
+  $("#cssmenu>ul>li>material-button").addClass('inactive');
   $("#cssmenu>ul>li").click(function() {
         element = $(this);
         var w = element.width();
@@ -408,13 +408,16 @@ app.controller("pollsCtrl", function ($scope,
         else {
             leftPos = element.position().left + w/2 - 6;
         }
-        if ($("#cssmenu>ul>li>ul").css('left') == "auto") {
+        if ($("#cssmenu>ul>li>ul").css('left') == "-96px") {
             $("#cssmenu>ul>li>ul").css('opacity',0);
-            $("#cssmenu>ul>li>ul").css('left',"-9999px");;
+            $("#cssmenu>ul>li>ul").css('left',"-9999px");
+            $("#cssmenu>ul>li>material-button").removeClass('active');
+            $("#cssmenu>ul>li>material-button").addClass('inactive');
         } else {
-
-        $("#cssmenu>ul>li>ul").css('left',"auto");
-        $("#cssmenu>ul>li>ul").css('opacity',1);   
+          $("#cssmenu>ul>li>ul").css('left',"-96px");
+          $("#cssmenu>ul>li>ul").css('opacity',1);
+          $("#cssmenu>ul>li>material-button").removeClass('inactive');
+          $("#cssmenu>ul>li>material-button").addClass('active');   
         }
     });
     $(document).mouseup(function (e) {
@@ -422,9 +425,19 @@ app.controller("pollsCtrl", function ($scope,
         if (!container.is(e.target) // if the target of the click isn't the container...
             && container.has(e.target).length === 0) { // ... nor a descendant of the container
             $("#cssmenu>ul>li>ul").css('opacity',0);
-            $("#cssmenu>ul>li>ul").css('left',"-9999px");       
+            $("#cssmenu>ul>li>ul").css('left',"-9999px");
+            $("#cssmenu>ul>li>material-button").addClass('inactive');
+            $("#cssmenu>ul>li>material-button").removeClass('active');       
         }
     });
+
+  $scope.getEndPollDate = function (dateStarted,pollTimeLength) {
+    if (dateStarted && pollTimeLength) {
+      var d = new Date(dateStarted.getTime() + (pollTimeLength*1000));    
+      return d.toString().substring(0,d.toString().lastIndexOf(":"));
+    }
+    return "";
+  };
 
   $scope.filterPolls = function (filter) {
     if (filter.filter === "All") {
@@ -487,11 +500,10 @@ app.controller("pollsCtrl", function ($scope,
     saveMatrix = {poll: false, template: true};
     $scope.startCustomizing(e, newTemplate, saveMatrix);
   };
-  $scope.hasData = function (i) {
-    var p = $scope.polls[i];
+  $scope.hasData = function (options) {
     var a = 0;
-    for (var i = 0; i < p.options.length; i++) {
-      a += p.options[i].count;
+    for (var i = 0; i < options.length; i++) {
+      a += options[i].count;
     };
     return a!=0;
   }
@@ -591,7 +603,6 @@ app.controller("pollsCtrl", function ($scope,
       controller: ['$scope', '$hideDialog', '$rootScope', '$filter', 'pollFind', function ($scope, $hideDialog, $rootScope, $filter, pollFind) {
         Cambrian.polls.onVoteReceived.connect(refreshPoll);
         $scope.poll = poll;
-        console.log(poll);
         if (poll.dateStarted) {
           var d = new Date(poll.dateStarted.getTime() + (poll.pollTimeLength*1000));    
           $scope.endPollDate = d.toString().substring(0,d.toString().lastIndexOf(":"));
@@ -602,6 +613,13 @@ app.controller("pollsCtrl", function ($scope,
         $scope.close = function () {
           $hideDialog();
         };
+        $scope.hasData = function (options) {
+          var a = 0;
+          for (var i = 0; i < options.length; i++) {
+            a += options[i].count;
+          };
+          return a!=0;
+        }
 
         $scope.copyPoll = function (e, poll) {
           $hideDialog();
@@ -797,14 +815,168 @@ app.controller("templatesCtrl", function ($scope,
 
 });
 
-app.controller('quickAddCtrl', function ($scope) {
+app.controller('quickAddCtrl', function ($scope, $timeout, $rootScope, pollNew, groupAll,pollCreateOrUpdate, $location) {
+
+  $scope.poll = pollNew();
+  $scope.poll.allowComments = true;
+  $scope.myGroups = groupAll();
+  $scope.ballotPreview = false;
+  $scope.optionsMenu = false;
+  var today = new Date();
+  var d = new Date(today.getTime() + (24*60*60*1000));
+  $scope.edate = d.format("mm/dd/yy");
+  $scope.endTime = new Date();
+  $scope.endTime.setHours(d.getHours());
+  $scope.endTime.setMinutes(d.getMinutes());
+  $scope.saveMatrix = {poll: false, template: false};
+  timepickerOptions = {appendTo:'head'};
+  if ($location.path() == "/polls") {
+    $scope.saveMatrix.poll = true;
+  } else {
+    $scope.saveMatrix.template = true;
+  }
+
+  $(document).mouseup(function (e) {
+    var container = $("#quickAddBox");
+    var datepicker = $("#ui-datepicker-div");
+    var timepicker = $(".ui-timepicker-wrapper");
+    if ((!container.is(e.target) && !datepicker.is(e.target) && !timepicker.is(e.target)) // if the target of the click isn't the container...
+        && (container.has(e.target).length === 0 && datepicker.has(e.target).length === 0 && timepicker.has(e.target).length === 0 )) // ... nor a descendant of the container
+    {
+      var exists = ($('#quickAddBox').length === 1)
+      if (exists) {
+        $scope.$apply(function() {
+          $scope.poll = pollNew();
+          $scope.poll.allowComments = true;
+          $scope.newItem = false;
+          $scope.ballotPreview = false;
+          $scope.optionsMenu = false;
+          $scope.quickAddForm.$setPristine();
+        });       
+      }
+    }
+  });
 
   $scope.$on('resetQuickAddForm', function () {
-    $scope.newTitle = '';
-    $scope.newDescription = '';
-    $scope.newItem = false;
-    $scope.quickAddForm.$setPristine();
+    $scope.$apply(function() {
+      $scope.poll = pollNew();
+      $scope.poll.allowComments = true;
+      $scope.newItem = false;
+      $scope.ballotPreview = false;
+      $scope.optionsMenu = false;
+      $scope.quickAddForm.$setPristine();
+    });
+    
   });
+  
+  $scope.convertTimeToSeconds = function (date, time) {
+    var pollDate = new Date(date +" " +time);
+    var todayDate = new Date();
+    return (pollDate.getTime()-todayDate.getTime())/1000;
+  };
+
+  function saveItem (item, saveMatrix, startNow) {
+    for (var i = 0; i<item.options.length; i++) {
+      if (!item.options[i].text) {
+        item.options.splice(i,1);
+      }
+    }
+    item.overflow = false;
+    item.status = "unsaved";
+    if (saveMatrix.poll) {
+      item.isTemplate = false;
+      pollCreateOrUpdate(item,startNow);
+    }
+
+    if (saveMatrix.template) {
+      item.isTemplate = true;
+      item.pollTargetId = "";
+      item.dateStarted = null;
+      item.dataStopped = null;
+      pollCreateOrUpdate(item,startNow);
+    }
+
+  };
+
+  $scope.save = function (startNow) {
+    if (!$scope.newDate) {
+      $scope.newDate = $scope.edate;
+    }
+    if ($scope.newDate && $scope.time) {
+      var seconds = $scope.convertTimeToSeconds($scope.newDate, $scope.time);
+      if (seconds > 0) {
+        $scope.poll.pollTimeLength = seconds | 0;
+        saveItem($scope.poll, $scope.saveMatrix, startNow);
+        $scope.poll.overflow = false;
+      }
+    }
+  }
+
+  $scope.getTime = function (time) {
+    if (time != undefined) {
+      $scope.time = time.toLocaleTimeString();
+    } else {
+      $scope.time = undefined;
+    }
+  }
+  
+  $scope.hasData = function (options) {
+    if (options.length == 0) {
+      return false;
+    }
+    for (var i = 0; i < options.length; i++) {
+      if (options[i].text == "") {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  $scope.keypressListener = function (event) {
+    if (event.charCode == 13) {
+      $timeout(function () {
+        $("#addOptionInput").focus();
+      });
+    }
+  }
+
+  $scope.checkForOptionDelete = function ($event,$index) {
+    if($scope.poll.options[$index].text === '' && $event.keyCode === 8) {
+      if ($scope.poll.options[$index].empty != undefined && $scope.poll.options[$index].empty) {
+        $scope.poll.options.splice($index, 1);
+        var previousChild;
+        if ($index > 0) {
+          previousChild = $index - 1;
+        } else {
+          if ($scope.poll.options.length > 0) {
+            previousChild = 0;
+          } else {
+            $scope.keypressListener({"charCode":13});
+            return;
+          }
+        }
+        $timeout(function () {
+          $rootScope.$broadcast('focusedIndex', {focus: previousChild});
+        });
+      } else {
+        $scope.poll.options[$index].empty = true;
+      }
+    }
+  };
+
+  $scope.removeOption = function ($index) {
+    $scope.poll.options.splice($index, 1);
+  };
+
+  $scope.addOption = function () {
+    var newOption = { text: $scope.newOptionText, subgroup: "", count: 0 };
+    $scope.poll.options.push(newOption);
+    $scope.newOptionText = "";
+    var index = $scope.poll.options.length - 1;
+    $timeout(function () {
+      $rootScope.$broadcast('focusedIndex', {focus: index});
+    });
+  };
 
 });
 

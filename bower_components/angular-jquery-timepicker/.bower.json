@@ -1,6 +1,6 @@
 {
   "name": "angular-jquery-timepicker",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "homepage": "https://github.com/Recras/angular-jquery-timepicker",
   "description": "An AngularJS directive for jQuery Timepicker",
   "main": "./src/timepickerdirective.js",
@@ -22,11 +22,11 @@
   "devDependencies": {
     "angular-mocks": "~1.x"
   },
-  "_release": "0.1.9",
+  "_release": "0.1.10",
   "_resolution": {
     "type": "version",
-    "tag": "0.1.9",
-    "commit": "eb876f279b1a5ff8b84f9013cbfa302df7940237"
+    "tag": "0.1.10",
+    "commit": "cee113b8cc87a11fcc4225391fcab36c3825601b"
   },
   "_source": "git://github.com/Recras/angular-jquery-timepicker.git",
   "_target": "~0.1.8",
