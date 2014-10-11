@@ -195,6 +195,7 @@ app.controller("pollAppCtrl", function ($scope,
           $scope.saveMatrix = saveMatrix;
           $scope.ballotPreview = false;
           $scope.optionsMenu = false;
+          $scope.poll.allowComments = true;
           if ($scope.poll.endTime) {
             $scope.endTime = new Date();
             $scope.endTime.setHours(parseInt($scope.poll.endTime.substring(0,2)));
