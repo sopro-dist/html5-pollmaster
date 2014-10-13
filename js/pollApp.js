@@ -297,8 +297,8 @@ app.controller("pollAppCtrl", function ($scope,
                   $hideDialog();
                 };
 
-                $scope.save = function (item, saveMatrix,e) {
-                  if ($scope.startNow) {
+                $scope.save = function (item, saveMatrix,e,startNow) {
+                  if (startNow) {
                     
                     $materialDialog({
                       templateUrl: 'partials/pollEndsDate.tmpl.html',
@@ -310,14 +310,14 @@ app.controller("pollAppCtrl", function ($scope,
                       controller: 'pollEndDateCtrl'
                     });
 
-                  $scope.startNow = false;
+                    startNow = false;
                     $hideDialog();
                   } else {
                     item.pollTimeLength = convertTimeToSeconds($scope.pollLength.numeral, $scope.pollLength.units);
-                    saveItem(item, saveMatrix, $scope.startNow && item.pollTargetId);
+                    saveItem(item, saveMatrix, startNow && item.pollTargetId);
                     item.overflow = false;  
                     
-                  $scope.startNow = false;
+                    startNow = false;
                     $hideDialog();
                   }
                   
@@ -829,6 +829,7 @@ app.controller('quickAddCtrl', function ($scope, $timeout, $rootScope, pollNew, 
   $scope.endTime = new Date();
   $scope.endTime.setHours(d.getHours());
   $scope.endTime.setMinutes(d.getMinutes());
+  $scope.time = today.toLocaleTimeString();
   $scope.saveMatrix = {poll: false, template: false};
   timepickerOptions = {appendTo:'head'};
   if ($location.path() == "/polls") {
@@ -897,19 +898,27 @@ app.controller('quickAddCtrl', function ($scope, $timeout, $rootScope, pollNew, 
       pollCreateOrUpdate(item,startNow);
     }
 
+    $scope.poll = pollNew();
+    $scope.poll.allowComments = true;
+    $scope.newItem = false;
+    $scope.ballotPreview = false;
+    $scope.optionsMenu = false;
+    $scope.quickAddForm.$setPristine();
+
   };
 
   $scope.save = function (startNow) {
     if (!$scope.newDate) {
       $scope.newDate = $scope.edate;
     }
-    if ($scope.newDate && $scope.time) {
-      var seconds = $scope.convertTimeToSeconds($scope.newDate, $scope.time);
-      if (seconds > 0) {
-        $scope.poll.pollTimeLength = seconds | 0;
-        saveItem($scope.poll, $scope.saveMatrix, startNow);
-        $scope.poll.overflow = false;
-      }
+    var seconds = $scope.convertTimeToSeconds($scope.newDate, $scope.time);
+    if (seconds > 0) {
+      $scope.poll.pollTimeLength = seconds | 0;
+      console.log("hey")
+      saveItem($scope.poll, $scope.saveMatrix, startNow);
+      $scope.poll.overflow = false;
+    } else {
+      console.log("error in seconds");
     }
   }
 
