@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 body {
 		background: #E0E0E0;
 		color: #400;
@@ -5,4 +6,13 @@ body {
 	}
 	h1 {
 		text-align: center;
+=======
+body {
+		background: #E0E0E0;
+		color: #400;
+		font-family: arial;
+	}
+	h1 {
+		text-align: center;
+>>>>>>> 4e2343a6ab747523b28164b2d2942783c9f042b6
 	}
