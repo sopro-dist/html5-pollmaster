@@ -17,7 +17,7 @@ var EXCLUDED_ICONS = [
   "material-icons/icons/system_icons/content/res/1x_web/ic_add_24dp.png",
   "material-icons/icons/system_icons/content/res/1x_web/ic_clear_18dp.png",
   "material-icons/icons/system_icons/content/res/1x_web/ic_content_copy_wht_18dp.png",
-  "material-icons/icons/system_icons/content/res/1x_web/ic_filter_24dp.png ",
+  "material-icons/icons/system_icons/content/res/1x_web/ic_filter_24dp.png",
   "material-icons/icons/system_icons/navigation/res/1x_web/ic_arrow_back_18dp.png",
   "material-icons/icons/system_icons/navigation/res/1x_web/ic_menu_24dp.png",
   "material-icons/icons/system_icons/navigation/res/1x_web/ic_menu_18dp.png",
