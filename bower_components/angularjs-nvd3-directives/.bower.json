@@ -41,10 +41,5 @@
   },
   "_source": "git://github.com/cmaurer/angularjs-nvd3-directives.git",
   "_target": "~0.0.7",
-<<<<<<< HEAD
   "_originalSource": "angularjs-nvd3-directives"
-=======
-  "_originalSource": "angularjs-nvd3-directives",
-  "_direct": true
->>>>>>> 4e2343a6ab747523b28164b2d2942783c9f042b6
 }

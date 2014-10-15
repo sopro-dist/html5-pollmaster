@@ -1,4 +1,5 @@
-<div class="cardholder" ng-class="{quilt:listView == 'quilt', stream:listView == 'stream'}" ng-repeat="poll in polls | filter:pollFilter:true" ng-mouseleave="poll.overflow = false">
+<div masonry>
+<div class="cardholder masonry-brick" ng-class="{quilt:listView == 'quilt', stream:listView == 'stream'}" ng-repeat="poll in polls | filter:pollFilter:true" ng-mouseleave="poll.overflow = false">
   <material-card class="mainCard" ng-class="{votes: poll.status === 'unvoted', voted: poll.status === 'voted', running: poll.status === 'started', completed: poll.status === 'stopped', unstarted: poll.status === 'unstarted'}" ng-mouseover="poll.menubar = true" ng-mouseleave="poll.menubar = false">
     <div class="cardContentContainer" ng-click="zoomPoll($event, poll)">
       <div class="pollOriginatorLine">
@@ -19,8 +20,8 @@
             </table>
           </div>
         </div>
-        <div class="pollReturns" ng-show="poll.status === 'started' || poll.status === 'stopped'">
-          <div class="optionCounts">
+        <div class="pollReturns" layout="horizontal" layout-align="center">
+          <div class="optionCounts" ng-show="poll.status === 'started' || poll.status === 'stopped'" flex>
             <div class="options">
               <table>
                 <tr ng-repeat="option in poll.options">
@@ -30,7 +31,18 @@
               </table>
             </div>
           </div>
-          <div class="pieChartContainer" ng-if="(poll.status === 'started' || poll.status === 'stopped' || poll.status === 'voted') && hasData(poll.options)">
+          <div class="optionPreview" ng-show="poll.status === 'unstarted' || poll.status === 'unvoted'"  flex="50">
+          <div class="options">
+            <table>
+              <tr><td colspan="2">VOTE</td></tr>
+              <tr ng-repeat="option in poll.options">  
+                <td class="previewCheckbox"><input type="checkbox" ng-model="option.isSelected" disabled></td>
+                <td>{{option.text}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+          <div class="pieChartContainer" ng-if="hasData(poll.options)">
             <nvd3-pie-chart
               id="{{'id'+$index}}"
               data="poll.options"
@@ -46,26 +58,33 @@
               tooltips="true">
             </nvd3-pie-chart>
           </div>
+           <div class="pieChartContainer" ng-if="!hasData(poll.options)">
+            <nvd3-pie-chart
+              id="{{'noOption'+$index}}"
+              data="noOptions"
+              x="xFunction()"
+              y="yFunction()"
+              width="100"
+              height="100"
+              margin="{left: 15, top: 15, bottom: 15, right: 15}"
+              showLabels="false"
+              pieLabelsOutside="true"
+              showValues="true"
+              labelType="value"
+              tooltips="true"
+              color="colorFunction()"
+              tooltipcontent="toolTipContentFunction()">
+            </nvd3-pie-chart>
+          </div>
         </div>
 
-        <div class="optionPreview" ng-show="poll.status === 'unstarted' || poll.status === 'unvoted'">
-          <div class="options">
-            <table>
-              <tr><td colspan="2">VOTE</td></tr>
-              <tr ng-repeat="option in poll.options">  
-                <td class="previewCheckbox"><input type="checkbox" ng-model="option.isSelected" disabled></td>
-                <td>{{option.text}}</td>
-              </tr>
-            </table>
-          </div>
-          <div class="clearBoth"></div>
-        </div>
+        
 
         <div class="clearBoth"></div>
       </div>
     </div>
     <div>
-      <div ng-if="poll.dateStarted && poll.pollTimeLength && poll.status === 'stopped'" class="pollEndsDate" align="center">
+      <div ng-if="poll.dateStarted && poll.pollTimeLength && poll.status === 'stopped'" class="pollEndsDate" align="right">
         Poll Ended At {{getEndPollDate(poll.dateStarted,poll.pollTimeLength)}} 
       </div>
       <div ng-if="poll.dateStarted && poll.pollTimeLength && (poll.status === 'unstarted' || poll.status === 'vote' || poll.status === 'started' || poll.status === 'unvoted')" class="pollEndsDate" align="center">
@@ -91,4 +110,5 @@
     <a class="copyAction" ng-click="copyPoll($event, poll)">Make a Copy</a><br />
     <a class="forkAction" ng-click="newTemplateFromPoll($event, poll)">Fork as a Template</a>
   </material-card>
+</div>
 </div>

@@ -8,7 +8,7 @@ if(Cambrian.JAPI !== undefined){
   japi = Cambrian.mockJAPI();
 }
 
-var app = angular.module("pollApp", ["ngRoute", "ui.bootstrap", "ngMaterial", 'nvd3ChartDirectives','ui.date','ui.timepicker']) // array is required
+var app = angular.module("pollApp", ["ngRoute", "ui.bootstrap", "ngMaterial", 'nvd3ChartDirectives','ui.date','ui.timepicker','wu.masonry']) // array is required
 var saveMatrix = {poll: false, template: false};
 
 app.config(function($routeProvider){
@@ -38,10 +38,10 @@ app.config(function($routeProvider){
 app.factory("menu", ['$rootScope', function ($rootScope) {
   var self;
   var filters = [{ filter: 'All', color: '#000' }, 
-                 { filter: 'Vote', color: '#a48623' },
-                 { filter: 'Running', color: '#458B74' },
-                 { filter: 'Unstarted', color: '#D2D6DF' },
-                 { filter: 'Completed', color: '#40505E' }];
+                 { filter: 'Vote', color: 'rgba(164, 134, 35, 0.7)' },
+                 { filter: 'Running', color: 'rgba(69, 139, 116, 0.7)' },
+                 { filter: 'Unstarted', color: 'rgba(64, 80, 94, 0.7)' },
+                 { filter: 'Completed', color: 'rgba(0, 0, 0, 0.7)' }];
 
   return self = {
     filters: filters,
@@ -195,7 +195,6 @@ app.controller("pollAppCtrl", function ($scope,
           $scope.saveMatrix = saveMatrix;
           $scope.ballotPreview = false;
           $scope.optionsMenu = false;
-          $scope.poll.allowComments = true;
           if ($scope.poll.endTime) {
             $scope.endTime = new Date();
             $scope.endTime.setHours(parseInt($scope.poll.endTime.substring(0,2)));
@@ -298,8 +297,7 @@ app.controller("pollAppCtrl", function ($scope,
                 };
 
                 $scope.save = function (item, saveMatrix,e,startNow) {
-                  if (startNow) {
-                    
+                  if (startNow) {    
                     $materialDialog({
                       templateUrl: 'partials/pollEndsDate.tmpl.html',
                       targetEvent: e,
@@ -310,14 +308,14 @@ app.controller("pollAppCtrl", function ($scope,
                       controller: 'pollEndDateCtrl'
                     });
 
-                    startNow = false;
+                  startNow = false;
                     $hideDialog();
                   } else {
                     item.pollTimeLength = convertTimeToSeconds($scope.pollLength.numeral, $scope.pollLength.units);
-                    saveItem(item, saveMatrix, startNow && item.pollTargetId);
+                    saveItem(item, saveMatrix, $scope.startNow && item.pollTargetId);
                     item.overflow = false;  
                     
-                    startNow = false;
+                  startNow = false;
                     $hideDialog();
                   }
                   
@@ -397,6 +395,32 @@ app.controller("pollsCtrl", function ($scope,
   $scope.polls = pollAll();
   $scope.addTitlePlaceholder = "Add Poll";
   $scope.addDescriptionPlaceholder = "Add Description";
+
+
+  // NVD3 CHARTS CONFIG ==========================================
+  $scope.noOptions = [
+    {
+      text:"No Votes",
+      count:1
+    },
+    {
+      text:"",
+      count:0
+    }
+  ];
+  var colorArray = ['#A7A7A7', '#000'];
+  $scope.colorFunction = function() {
+    return function(d, i) {
+        return colorArray[i];
+      };
+  }
+  $scope.toolTipContentFunction = function(){
+    return function(key, x, y, e, graph) {
+        return  key;
+    }
+  }
+  //====================================================================
+
 
   $("#cssmenu>ul>li>material-button").addClass('inactive');
   $("#cssmenu>ul>li").click(function() {
@@ -603,6 +627,29 @@ app.controller("pollsCtrl", function ($scope,
       targetEvent: e,
       controller: ['$scope', '$hideDialog', '$rootScope', '$filter', 'pollFind', function ($scope, $hideDialog, $rootScope, $filter, pollFind) {
         Cambrian.polls.onVoteReceived.connect(refreshPoll);
+        // NVD3 CHARTS CONFIG ==========================================
+        $scope.noOptions = [
+          {
+            text:"No Votes",
+            count:1
+          },
+          {
+            text:"",
+            count:0
+          }
+        ];
+        var colorArray = ['#A7A7A7', '#000'];
+        $scope.colorFunction = function() {
+          return function(d, i) {
+              return colorArray[i];
+            };
+        }
+        $scope.toolTipContentFunction = function(){
+          return function(key, x, y, e, graph) {
+              return  key;
+          }
+        }
+        //====================================================================
         $scope.poll = poll;
         if (poll.dateStarted) {
           var d = new Date(poll.dateStarted.getTime() + (poll.pollTimeLength*1000));    
@@ -897,7 +944,6 @@ app.controller('quickAddCtrl', function ($scope, $timeout, $rootScope, pollNew, 
       item.dataStopped = null;
       pollCreateOrUpdate(item,startNow);
     }
-
     $scope.poll = pollNew();
     $scope.poll.allowComments = true;
     $scope.newItem = false;
@@ -911,7 +957,8 @@ app.controller('quickAddCtrl', function ($scope, $timeout, $rootScope, pollNew, 
     if (!$scope.newDate) {
       $scope.newDate = $scope.edate;
     }
-    var seconds = $scope.convertTimeToSeconds($scope.newDate, $scope.time);
+    if ($scope.newDate && $scope.time) {
+       var seconds = $scope.convertTimeToSeconds($scope.newDate, $scope.time);
     if (seconds > 0) {
       $scope.poll.pollTimeLength = seconds | 0;
       console.log("hey")
@@ -919,6 +966,7 @@ app.controller('quickAddCtrl', function ($scope, $timeout, $rootScope, pollNew, 
       $scope.poll.overflow = false;
     } else {
       console.log("error in seconds");
+      }
     }
   }
 
