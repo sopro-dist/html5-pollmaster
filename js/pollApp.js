@@ -107,12 +107,12 @@ app.controller("pollAppCtrl", function ($scope,
 
     $scope.menu = menu;
     $scope.menu.selectFilter(menu.filters[0]);
-    if ($location.path() == "/polls") {
-      $scope.view=true;
-      $scope.isTmpl = false;
+    if ($location.path() == "/templates") {
+      $scope.view=!true;
+      $scope.isTmpl = !false;
     } else {
-      $scope.view=false;
-      $scope.isTmpl = true;
+      $scope.view=!false;
+      $scope.isTmpl = !true;
     }
 
     
