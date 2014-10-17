@@ -203,7 +203,23 @@ app.controller("pollAppCtrl", function ($scope,
 
           $timeout(function () {
             $("#addOptionInput").focus();
-          });          
+          });      
+
+          $scope.selected = -1;
+          $scope.optionSelected = function (i) {
+            if (!$scope.poll.allowMultipleChoices) {
+              if ($scope.selected != -1) {
+                if ($scope.selected == i) {
+                  $scope.selected = -1;
+                } else {
+                  $scope.poll.options[$scope.selected].isSelected = false;
+                  $scope.selected = i;
+                }  
+              } else {
+                $scope.selected = i;
+              }
+            }
+          }    
 
           $scope.checkHeight = function () {
             var dialogHeight = $('.dialog-content').height();
@@ -456,6 +472,22 @@ app.controller("pollsCtrl", function ($scope,
         }
     });
 
+  $scope.selected = -1;
+  $scope.optionSelected = function (poll,i) {
+    if (!poll.allowMultipleChoices) {
+      if ($scope.selected != -1) {
+        if ($scope.selected == i) {
+          $scope.selected = -1;
+        } else {
+          poll.options[$scope.selected].isSelected = false;
+          $scope.selected = i;
+        }  
+      } else {
+        $scope.selected = i;
+      }
+    }
+  }
+
   $scope.getEndPollDate = function (dateStarted,pollTimeLength) {
     if (dateStarted && pollTimeLength) {
       var d = new Date(dateStarted.getTime() + (pollTimeLength*1000));    
@@ -473,6 +505,7 @@ app.controller("pollsCtrl", function ($scope,
   };
 
   $scope.zoomPoll = function (e, poll) {
+    console.log(e);
     if (poll.status === "unstarted") {
       $scope.editPoll(e, poll);
     } else if (poll.status === 'unvoted') {
