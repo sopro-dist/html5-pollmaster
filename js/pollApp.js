@@ -25,12 +25,8 @@ app.config(function($routeProvider){
     templateUrl: "partials/votingBooth.tmpl.html",
     controller: "votingBoothCtrl"
   }).
-  when("/", {
-    templateUrl: "partials/polls.tmpl.html",
-    controller: "pollsCtrl"
-  }).
   otherwise({
-    redirectTo: "/"
+    redirectTo: "/polls"
   });
 
 });
@@ -658,7 +654,7 @@ app.controller("pollsCtrl", function ($scope,
     $materialDialog({
       templateUrl: 'partials/showPoll.tmpl.html',
       targetEvent: e,
-      controller: ['$scope', '$hideDialog', '$rootScope', '$filter', 'pollFind', function ($scope, $hideDialog, $rootScope, $filter, pollFind) {
+      controller: ['$scope', '$hideDialog', '$rootScope', '$filter', 'pollFind', 'pollResults', function ($scope, $hideDialog, $rootScope, $filter, pollFind, pollResults) {
         Cambrian.polls.onVoteReceived.connect(refreshPoll);
         // NVD3 CHARTS CONFIG ==========================================
         $scope.noOptions = [
@@ -683,7 +679,11 @@ app.controller("pollsCtrl", function ($scope,
           }
         }
         //====================================================================
-        $scope.poll = poll;
+        if (poll.status === 'voted') {
+          $scope.poll = poll;
+        } else {
+          $scope.poll = pollResults(poll);
+        }
         if (poll.dateStarted) {
           var d = new Date(poll.dateStarted.getTime() + (poll.pollTimeLength*1000));    
           $scope.endPollDate = d.toString().substring(0,d.toString().lastIndexOf(":"));
