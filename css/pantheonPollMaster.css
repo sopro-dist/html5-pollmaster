@@ -1,17 +1,25 @@
-.mainContentPolls { 
+/*.mainContentPolls { 
 	background: url(../assets/images/153450.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+}*/
+
+.mainContentPolls { 
+	background-color: #eee;
 }
 
-.mainContentTemplates { 
+/*.mainContentTemplates { 
 	background: url(../assets/images/434655.jpg) no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+}*/
+
+.mainContentTemplates { 
+	background-color: #eee;
 }
 
 #quickAddTitle {
@@ -26,21 +34,36 @@
 	font-size: 14px;
 }
 
-#quickAddButton {
-	border: 1px solid darkgray;
-	background-color: gainsboro;
-	color: black;
-	margin-right: 5px;
+.quickButton {
+	box-shadow: none;
+	background-color: #f5f5f5;
+	background-image: -webkit-linear-gradient(top,#f5f5f5,#f1f1f1);
+	color: #444;
+	border:1px solid rgba(0,0,0,0.1); 
+	border-radius: 2px;
+	cursor: default;
+	font-size: 11px;
+	font-weight: bold;
+	text-align: center;
+	white-space: nowrap;
+	height: 27px;
+	line-height: 27px;
+	min-width: 54px;
+	outline: 0;
+	padding: 0 8px;
+}
+.quickButton>button {
+	padding: 0px;
+}
+.quickButton:hover {
+	box-shadow: none;
+	background-color: #f8f8f8 !important;
+	background-image: -webkit-linear-gradient(top,#f8f8f8,#f1f1f1);
+	color: #333;
+	border:1px solid #c6c6c6; 
 }
 
-#quickStartButton {
-	border: 1px solid darkgray;
-	background-color: gainsboro;
-	color: black;
-	margin-right: 10px;
-}
-
-.votes {
+/*.votes {
   background: rgba(164, 134, 35, 0.7);
   border: 1px solid rgba(228, 189, 60, 0.4);
 }
@@ -60,19 +83,16 @@
 .unstarted {
 	background: rgba(64, 80, 94, 0.7);	
   border: 1px solid rgba(100, 111, 121, 0.4);
-}
+}*/
 
 .pantheonToolbar {
-	background-color: #000;
+	/*background-color: #000;*/
+	background-color: #4285f4 !important;
 }
 
 .menu-item {
 	background-color: rgba(255,255,255,0);
 	font-weight: bold;
-}
-
-material-sidenav {
-	background-color: rgba(0,0,0,0.8);
 }
 
 #dialogLayout {
@@ -92,26 +112,18 @@ g text {
 	height: inherit;
 }
 
-material-tabs .tabs-header .tabs-header-items {
-	background-color: rgba(0, 0, 0, 0.5);	
-}
-
-material-ink-bar {
-	background: #fff;
-}
-
 .template {
 	height: 88px;
 }
 
-material-card {
+/*material-card {
 	background: rgba(51, 48, 30, 0.7);
 	border: 1px solid rgba(113, 109, 83, 0.5);
 	color: white;
 	-webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
-}
+}*/
 
 .overflowMenu {
 	color: black;
@@ -134,7 +146,6 @@ material-card {
 	border: 1px solid white;
 	color: white;
 }
-
-.menu-item {
-	color: #ccc 
+.md-toolbar-tools.sidenavToolbar {
+	color: #333;
 }

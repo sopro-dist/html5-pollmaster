@@ -15,6 +15,6 @@
     "commit": "8abb66d1f45c16d8360b42e1822d50ecbef215f0"
   },
   "_source": "git://github.com/desandro/jquery-bridget.git",
-  "_target": "~1.0.1",
+  "_target": ">=1 <2",
   "_originalSource": "jquery-bridget"
 }

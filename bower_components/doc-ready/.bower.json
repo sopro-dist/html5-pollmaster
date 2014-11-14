@@ -39,6 +39,6 @@
     "commit": "3efcaebe5a100cc68d6ec7553ba19b9adcd42eb6"
   },
   "_source": "git://github.com/desandro/doc-ready.git",
-  "_target": "~1.0.3",
-  "_originalSource": "doc-ready"
+  "_target": ">=1.0.1 <2.0",
+  "_originalSource": "desandro/doc-ready"
 }
